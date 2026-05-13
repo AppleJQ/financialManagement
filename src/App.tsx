@@ -1,8 +1,17 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import StockDetail from './pages/StockDetail'
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <h1 className="text-2xl font-bold p-4">A股行情分析</h1>
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-900 text-white">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/stock/:code" element={<StockDetail />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   )
 }
 
