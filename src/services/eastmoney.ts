@@ -146,7 +146,10 @@ export async function fetchAllStocks(): Promise<StockInfo[]> {
     }
   )
 
-  if (!resp.data?.diff) return []
+  if (!resp.data?.diff) {
+    console.warn('fetchAllStocks: no data returned', resp)
+    return []
+  }
 
   const stocks: StockInfo[] = resp.data.diff
     .filter((item) => {

@@ -19,8 +19,14 @@ export function jsonp<T>(url: string, params: Record<string, string> = {}): Prom
 
     ;(window as unknown as Record<string, unknown>)[callbackName] = (data: T) => {
       clearTimeout(timeoutId)
-      cleanup()
       resolve(data)
+      // Cleanup after resolve to avoid timing issues
+      setTimeout(() => {
+        delete (window as unknown as Record<string, unknown>)[callbackName]
+        if (script.parentNode) {
+          script.parentNode.removeChild(script)
+        }
+      }, 0)
     }
 
     const queryString = new URLSearchParams({

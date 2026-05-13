@@ -19,9 +19,11 @@ export default function StockSearch() {
     setLoading(true)
     try {
       const data = await searchStocks(kw)
+      console.log('Search results for', kw, ':', data.length, 'items')
       setResults(data)
       setShowDropdown(true)
-    } catch {
+    } catch (err) {
+      console.error('Search failed:', err)
       setResults([])
     } finally {
       setLoading(false)
