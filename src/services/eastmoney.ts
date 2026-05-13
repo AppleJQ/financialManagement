@@ -181,7 +181,7 @@ export async function searchStocks(keyword: string): Promise<StockInfo[]> {
   if (keyword.trim().length < 1) return []
 
   try {
-    const resp = await jsonp<{ QuotationCodeTable: { Data: Array<{ Code: string; Name: string; SecurityTypeName: string }> } }>(
+    const resp = await jsonp<{ QuotationCodeTable: { Data: Array<{ Code: string; Name: string; SecurityTypeName: string; SecurityType: string }> } }>(
       'https://searchapi.eastmoney.com/api/suggest/get',
       {
         input: keyword.trim(),
@@ -193,9 +193,9 @@ export async function searchStocks(keyword: string): Promise<StockInfo[]> {
 
     if (!resp.QuotationCodeTable?.Data) return []
 
-    // Only keep A-share stocks (沪深A股)
+    // Only keep A-share stocks (深A, 沪A)
     return resp.QuotationCodeTable.Data
-      .filter((item) => item.SecurityTypeName === '沪深A股')
+      .filter((item) => item.SecurityTypeName === '深A' || item.SecurityTypeName === '沪A')
       .map((item) => ({
         code: item.Code,
         name: item.Name,
