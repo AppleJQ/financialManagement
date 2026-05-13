@@ -7,23 +7,27 @@ export default function StockSearch() {
   const [results, setResults] = useState<StockInfo[]>([])
   const [showDropdown, setShowDropdown] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const navigate = useNavigate()
   const containerRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const doSearch = useCallback(async (kw: string) => {
     const trimmed = kw.trim()
-    if (trimmed.length < 1) {
-      setResults([])
-      return
-    }
+    if (!trimmed) return
+
     setLoading(true)
+    setError('')
     try {
       const data = await searchStocks(trimmed)
       setResults(data)
-      setShowDropdown(data.length > 0)
+      if (data.length > 0) {
+        setShowDropdown(true)
+      } else {
+        setError('未找到匹配的股票')
+      }
     } catch (err) {
       console.error('Search failed:', err)
+      setError('搜索失败，请稍后重试')
       setResults([])
     } finally {
       setLoading(false)
@@ -46,6 +50,7 @@ export default function StockSearch() {
     setKeyword('')
     setShowDropdown(false)
     setResults([])
+    setError('')
     navigate(`/stock/${stock.code}`)
   }
 
@@ -63,10 +68,9 @@ export default function StockSearch() {
     <div ref={containerRef} className="relative w-full max-w-md">
       <div className="flex gap-2">
         <input
-          ref={inputRef}
           type="text"
           value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
+          onChange={(e) => { setKeyword(e.target.value); setError('') }}
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setShowDropdown(true)}
           placeholder="输入股票代码或名称"
@@ -74,7 +78,7 @@ export default function StockSearch() {
         />
         <button
           onClick={handleSearch}
-          disabled={loading}
+          disabled={loading || !keyword.trim()}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors whitespace-nowrap flex items-center gap-1"
         >
           {loading ? (
@@ -87,6 +91,9 @@ export default function StockSearch() {
           搜索
         </button>
       </div>
+      {error && !showDropdown && (
+        <p className="text-xs text-yellow-500 mt-1">{error}</p>
+      )}
       {showDropdown && results.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-h-64 overflow-y-auto">
           {results.map((stock) => (
@@ -99,9 +106,7 @@ export default function StockSearch() {
                 <span className="text-gray-400 mr-2">{stock.code}</span>
                 <span>{stock.name}</span>
               </span>
-              <span className={stock.changePct > 0 ? 'text-red-500' : stock.changePct < 0 ? 'text-green-500' : 'text-gray-400'}>
-                {stock.price > 0 ? stock.price.toFixed(2) : '--'}
-              </span>
+              <span className="text-xs text-gray-500">点击查看</span>
             </button>
           ))}
         </div>
