@@ -6,7 +6,7 @@ export function jsonp<T>(url: string, params: Record<string, string> = {}): Prom
     const script = document.createElement('script')
 
     const cleanup = () => {
-      delete (window as Record<string, unknown>)[callbackName]
+      delete (window as unknown as Record<string, unknown>)[callbackName]
       if (script.parentNode) {
         script.parentNode.removeChild(script)
       }
@@ -17,7 +17,7 @@ export function jsonp<T>(url: string, params: Record<string, string> = {}): Prom
       reject(new Error(`JSONP request timeout: ${url}`))
     }, 15000)
 
-    ;(window as Record<string, unknown>)[callbackName] = (data: T) => {
+    ;(window as unknown as Record<string, unknown>)[callbackName] = (data: T) => {
       clearTimeout(timeoutId)
       cleanup()
       resolve(data)

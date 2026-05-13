@@ -101,8 +101,10 @@ export default function KLineChart({ code }: Props) {
 
     chartInstanceRef.current = chart
 
-    chart.createIndicator('MA', false, { id: 'candle_pane' })
-    chart.createIndicator('VOL')
+    if (chart) {
+      chart.createIndicator('MA', false, { id: 'candle_pane' })
+      chart.createIndicator('VOL')
+    }
 
     return () => {
       if (chartRef.current) {
